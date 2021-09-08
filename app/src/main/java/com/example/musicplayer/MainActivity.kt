@@ -17,27 +17,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-        requestPermission()
-
     }
 
-    private fun hasPermission(): Boolean {
-        return ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
 
-    }
-
-    private fun requestPermission() {
-        var permission = mutableListOf<String>()
-
-        if (!hasPermission()) {
-            permission.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-        if (permission.isNotEmpty()) {
-            ActivityCompat.requestPermissions(this, permission.toTypedArray(), 8)
-        }
-    }
 }

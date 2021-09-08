@@ -1,5 +1,7 @@
 package com.example.musicplayer
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
@@ -10,6 +12,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicplayer.Adapter.SongsAdapter
@@ -27,6 +30,8 @@ class ListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
+        requestPermission()
+
         listView = findViewById(R.id.recycler_view)
 
         linearLayoutManager = LinearLayoutManager(this)
@@ -36,6 +41,7 @@ class ListActivity : AppCompatActivity() {
         val adapter = SongsAdapter(audioList, this)
         listView.adapter = adapter
         listView.setHasFixedSize(true)
+
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -84,6 +90,26 @@ class ListActivity : AppCompatActivity() {
         }
 
         audioCursor?.close()
+    }
+
+    private fun hasPermission(): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+
+    }
+
+    private fun requestPermission() {
+        val permission = mutableListOf<String>()
+
+        if (!hasPermission()) {
+            permission.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        if (permission.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, permission.toTypedArray(), 8)
+
+        }
     }
 
 
