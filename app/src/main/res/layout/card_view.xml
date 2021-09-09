@@ -33,6 +33,12 @@
                 android:id="@+id/song_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
                 android:text="Song"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sdp" />
@@ -46,7 +52,6 @@
                 android:textColor="#5E5E5E" />
 
         </LinearLayout>
-
 
     </LinearLayout>
 

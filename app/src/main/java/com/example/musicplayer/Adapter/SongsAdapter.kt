@@ -65,4 +65,5 @@ class SongsAdapter(private val arrayList: ArrayList<SongModel>, val context: Con
     }
 
 
+
 }

@@ -1,6 +1,7 @@
 package com.example.musicplayer
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
@@ -85,18 +86,23 @@ class ListActivity : AppCompatActivity() {
                     val path = Uri.parse(url)
 
                     val songModel = SongModel(path, songName, artistName, duration)
-                    Log.i("path_uri", path.toString())
+
                     audioList.add(songModel)
 
 
                 } while (audioCursor.moveToNext())
-                Log.i("URL", audioList.toString())
             }
         }
 
+        // a List has sortby method in which we can sort a list of object with respect to a
+        // parameter of the object, in this case it is sorted w.r.t. name
+        audioList.sortBy { it.name }
         audioCursor?.close()
     }
 
+    override fun onBackPressed() {
+        this.finish()
+    }
 
     private fun requestPermission() {
         val permission = mutableListOf<String>()
@@ -116,6 +122,5 @@ class ListActivity : AppCompatActivity() {
         ) == PackageManager.PERMISSION_GRANTED
 
     }
-
 
 }

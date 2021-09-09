@@ -3,6 +3,7 @@ package com.example.musicplayer
 import android.Manifest
 import android.app.Activity
 import android.app.DownloadManager
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -19,5 +20,8 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
+    override fun onBackPressed() {
+        val intent = Intent(this, ListActivity::class.java)
+        startActivity(intent)
+    }
 }
