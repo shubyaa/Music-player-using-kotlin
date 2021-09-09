@@ -1,7 +1,6 @@
 package com.example.musicplayer.Adapter
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
@@ -15,10 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.musicplayer.Model.SongModel
 import com.example.musicplayer.R
-import com.squareup.picasso.Picasso
 import java.util.*
 
-class SongsAdapter(private val arrayList: ArrayList<SongModel>, val context:Context) :
+//Adapter is used to adapt a card assigned to your model object in your list view(in this case RecyclerView)
+class SongsAdapter(private val arrayList: ArrayList<SongModel>, val context: Context) :
     RecyclerView.Adapter<SongsAdapter.MyViewHolder>() {
 
     class MyViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
@@ -34,7 +33,15 @@ class SongsAdapter(private val arrayList: ArrayList<SongModel>, val context:Cont
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        //Picasso.get().load(model.image).centerCrop().into(holder.imageView)
+        //This method retrieves data and displays inside the view (i.e. Card) while binding
+        val byteArray = getAlbumArt(arrayList[position].image)
+        if (byteArray != null) {
+        //Glide Library has a function to convert byte array and display as Bitmap inside the target or ImageView.
+            Glide.with(context).asBitmap().load(byteArray).centerCrop().into(holder.imageView)
+        } else {
+            Glide.with(context).asBitmap().load(R.drawable.music_note).centerCrop()
+                .into(holder.imageView)
+        }
 
         holder.songName.text = arrayList[position].name
         holder.artistName.text = arrayList[position].artist
@@ -43,5 +50,19 @@ class SongsAdapter(private val arrayList: ArrayList<SongModel>, val context:Cont
     override fun getItemCount(): Int {
         return arrayList.size
     }
+
+    //AlbumArt - we use metaDataRetriever to retrieve the Image in ByteArray from
+    // Uri provided and returns that ByteArray.
+    private fun getAlbumArt(uri: Uri): ByteArray? {
+
+        val metadataRetriever = MediaMetadataRetriever()
+        metadataRetriever.setDataSource(uri.toString())
+
+        val result: ByteArray? = metadataRetriever.embeddedPicture
+        metadataRetriever.release()
+
+        return result
+    }
+
 
 }

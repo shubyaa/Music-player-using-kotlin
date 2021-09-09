@@ -3,8 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/_2sdp"
+    android:layout_marginVertical="@dimen/_3sdp"
     android:backgroundTint="#CCE3FF"
-    app:cardCornerRadius="@dimen/_10sdp">
+    android:elevation="@dimen/_10sdp"
+    app:cardCornerRadius="@dimen/_7sdp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +19,8 @@
             android:id="@+id/album_thumbnail"
             android:layout_width="@dimen/_60sdp"
             android:layout_height="@dimen/_60sdp"
-            android:src="@mipmap/ic_launcher" />
+            android:background="#D7E7FF"
+            android:src="@drawable/music_note" />
 
         <LinearLayout
             android:layout_width="@dimen/_200sdp"
@@ -38,7 +42,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:text="artist" />
+                android:text="artist"
+                android:textColor="#5E5E5E" />
 
         </LinearLayout>
 

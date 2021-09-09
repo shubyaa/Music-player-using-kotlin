@@ -1,14 +1,18 @@
 package com.example.musicplayer.Model
 
+import android.net.Uri
+
 
 data class SongModel (
-    var image: String,
+    var image: Uri,
     var name: String,
     var artist: String,
     var data: String,
     var duration: Double
 ) {
-    constructor(image: String, name: String, artist: String, duration: Double): this(
+    //A constructor is made with selective parameters so that whenever we need can make an
+    // object of the song even if we have very few parameters.
+    constructor(image: Uri, name: String, artist: String, duration: Double): this(
         image = image,
         name = name,
         artist = artist,

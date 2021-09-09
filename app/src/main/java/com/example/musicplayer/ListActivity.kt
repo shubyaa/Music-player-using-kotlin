@@ -44,6 +44,7 @@ class ListActivity : AppCompatActivity() {
 
     }
 
+    // function to getAudioFiles
     @RequiresApi(Build.VERSION_CODES.R)
     fun getAudioFiles() {
         val uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -55,6 +56,10 @@ class ListActivity : AppCompatActivity() {
             MediaStore.Audio.Media.DATA, //For Image
             MediaStore.Audio.Media.ARTIST,
         )
+
+        //Cursor is an interface where with the help of which we can access & write data
+        // according to the requirement
+
         val audioCursor: Cursor? = contentResolver.query(
             uri,
             proj,
@@ -62,8 +67,6 @@ class ListActivity : AppCompatActivity() {
             null,
             null
         )
-
-
 
         if (audioCursor != null) {
             if (audioCursor.moveToFirst()) {
@@ -79,8 +82,10 @@ class ListActivity : AppCompatActivity() {
                     val title =
                         audioCursor.getString(audioCursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
 
-                    val songModel = SongModel(url, songName, artistName, duration)
-                    Log.i("URL", url)
+                    val path = Uri.parse(url)
+
+                    val songModel = SongModel(path, songName, artistName, duration)
+                    Log.i("path_uri", path.toString())
                     audioList.add(songModel)
 
 
@@ -92,13 +97,6 @@ class ListActivity : AppCompatActivity() {
         audioCursor?.close()
     }
 
-    private fun hasPermission(): Boolean {
-        return ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
-
-    }
 
     private fun requestPermission() {
         val permission = mutableListOf<String>()
@@ -108,8 +106,15 @@ class ListActivity : AppCompatActivity() {
         }
         if (permission.isNotEmpty()) {
             ActivityCompat.requestPermissions(this, permission.toTypedArray(), 8)
-
         }
+    }
+
+    private fun hasPermission(): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+
     }
 
 
