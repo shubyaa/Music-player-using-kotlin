@@ -1,16 +1,12 @@
 package com.example.musicplayer
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.provider.MediaStore.Audio.AlbumColumns.ALBUM_ART
-import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -18,12 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicplayer.Adapter.SongsAdapter
 import com.example.musicplayer.Model.SongModel
-import kotlinx.android.synthetic.main.activity_list.*
-import java.util.*
+
 
 class ListActivity : AppCompatActivity() {
     private lateinit var linearLayoutManager: LinearLayoutManager
-    var audioList: ArrayList<SongModel> = ArrayList<SongModel>()
+    var audioList: ArrayList<SongModel> = ArrayList()
     lateinit var listView: RecyclerView
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -37,17 +32,19 @@ class ListActivity : AppCompatActivity() {
 
         linearLayoutManager = LinearLayoutManager(this)
         listView.layoutManager = linearLayoutManager
-        getAudioFiles()
+
+        audioList.addAll(getAudioFiles())
+
 
         val adapter = SongsAdapter(audioList, this)
         listView.adapter = adapter
         listView.setHasFixedSize(true)
-
     }
 
     // function to getAudioFiles
     @RequiresApi(Build.VERSION_CODES.R)
-    fun getAudioFiles() {
+    fun getAudioFiles(): ArrayList<SongModel> {
+        val list: ArrayList<SongModel> = ArrayList()
         val uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val proj = arrayOf(
             MediaStore.Audio.Media.DISPLAY_NAME,
@@ -85,9 +82,9 @@ class ListActivity : AppCompatActivity() {
 
                     val path = Uri.parse(url)
 
-                    val songModel = SongModel(path, songName, artistName, duration)
+                    val songModel = SongModel(path, songName, artistName, duration, path)
 
-                    audioList.add(songModel)
+                    list.add(songModel)
 
 
                 } while (audioCursor.moveToNext())
@@ -96,8 +93,10 @@ class ListActivity : AppCompatActivity() {
 
         // a List has sortby method in which we can sort a list of object with respect to a
         // parameter of the object, in this case it is sorted w.r.t. name
-        audioList.sortBy { it.name }
+        list.sortBy { it.name }
         audioCursor?.close()
+
+        return list
     }
 
     override fun onBackPressed() {
