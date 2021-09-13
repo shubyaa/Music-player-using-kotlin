@@ -28,6 +28,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        list = getAudioFiles()
+        position = intent.getIntExtra("position", -1)
+
 
         val songName = findViewById<TextView>(R.id.textView)
         val artistName = findViewById<TextView>(R.id.textView2)
@@ -41,6 +44,10 @@ class MainActivity : AppCompatActivity() {
         val startTime = findViewById<TextView>(R.id.start_time)
         val endTime = findViewById<TextView>(R.id.end_time)
         getIntentMethod()
+
+        songName.text = list[position].name
+        artistName.text = list[position].artist
+
 
         play_pause.setOnClickListener {
             if (mediaPlayer!!.isPlaying) {
@@ -56,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         runnable = Runnable {
             seekBar.progress = mediaPlayer!!.currentPosition
             startTime.text = mediaPlayer!!.currentPosition.toString()
-            endTime.text = mediaPlayer!!.currentPosition.toString()
+            endTime.text = mediaPlayer!!.duration.toString()
 
             handler.postDelayed(runnable, 1000)
 
@@ -87,8 +94,6 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun getIntentMethod() {
-        list = getAudioFiles()
-        position = intent.getIntExtra("position", -1)
 
         uri = Uri.EMPTY
         uri = list[position].songUri
@@ -223,6 +228,7 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onBackPressed() {
+        mediaPlayer!!.stop()
         finish()
 
     }

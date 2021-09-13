@@ -18,13 +18,8 @@ import com.example.musicplayer.Model.SongModel
 import com.example.musicplayer.R
 
 //Adapter is used to adapt a card assigned to your model object in your list view(in this case RecyclerView)
-class SongsAdapter(private val arrayList: ArrayList<SongModel>, val context: Context?) :
+class SongsAdapter(private val arrayList: ArrayList<SongModel>, private val context: Context?) :
     RecyclerView.Adapter<SongsAdapter.MyViewHolder>() {
-    constructor() : this(
-        ArrayList(),
-        null
-    ) {
-    }
 
     val array = arrayList
 
