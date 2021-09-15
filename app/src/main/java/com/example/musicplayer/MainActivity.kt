@@ -3,6 +3,7 @@ package com.example.musicplayer
 import android.annotation.SuppressLint
 import android.database.Cursor
 import android.media.AudioAttributes
+import android.media.Image
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.net.Uri
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     var demUri: Uri = Uri.EMPTY
     var list: ArrayList<SongModel> = ArrayList()
     private lateinit var runnable: Runnable
+    private lateinit var albumImage: ImageView
     private var handler = Handler()
     private var mediaPlayer: MediaPlayer? = null
 
@@ -38,11 +40,10 @@ class MainActivity : AppCompatActivity() {
         list = getAudioFiles()
         position = intent.getIntExtra("position", -1)
 
-        uri = list[position].songUri
 
         val songName = findViewById<TextView>(R.id.textView)
         val artistName = findViewById<TextView>(R.id.textView2)
-        val albumImage = findViewById<ImageView>(R.id.album_art)
+        albumImage = findViewById<ImageView>(R.id.album_art)
 
         val play_pause = findViewById<ImageButton>(R.id.play_pause)
         val previous = findViewById<ImageView>(R.id.previous)
@@ -56,10 +57,9 @@ class MainActivity : AppCompatActivity() {
         songName.text = list[position].name
         artistName.text = list[position].artist
 
-        val byteArray = getAlbumArt(uri)
-        Glide.with(applicationContext).asBitmap().load(byteArray).centerCrop().into(albumImage)
 
 
+       //play & pause Button
         play_pause.setOnClickListener {
             if (mediaPlayer!!.isPlaying) {
                 play_pause.setBackgroundResource(R.drawable.play)
@@ -68,6 +68,13 @@ class MainActivity : AppCompatActivity() {
                 play_pause.setBackgroundResource(R.drawable.pause)
                 mediaPlayer!!.start()
             }
+        }
+        //next & previous Button
+        next.setOnClickListener {
+            nextPrevious(name = true)
+        }
+        previous.setOnClickListener {
+            nextPrevious(name = false)
         }
 
         seekBar.max = mediaPlayer!!.duration
@@ -100,6 +107,12 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+
+    }
+
+    private fun setAlbumImage(image: ImageView, uri: Uri){
+        val byteArray = getAlbumArt(uri)
+        Glide.with(applicationContext).asBitmap().load(byteArray).centerCrop().into(image)
 
     }
 
@@ -170,8 +183,6 @@ class MainActivity : AppCompatActivity() {
         return list
     }
 
-
-    @SuppressLint("SimpleDateFormat")
     fun timeFormat(duration: Int): String {
         val minutes = (duration % (1000 * 60 * 60) / (1000 * 60))
         val seconds = (duration % (1000 * 60 * 60) % (1000 * 60) / 1000)
@@ -180,6 +191,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun playMedia() {
+        uri = list[position].songUri
+
+        setAlbumImage(albumImage, uri)
+
         try {
             if (mediaPlayer == null) {
                 mediaPlayer = MediaPlayer().apply {
@@ -209,8 +224,38 @@ class MainActivity : AppCompatActivity() {
 
         return result
     }
+    private fun nextPrevious(name:Boolean){
+        if(name){
+            position = checkPosition(position, true)
+            playMedia()
+        }else{
+            position = checkPosition(position, false)
+            playMedia()
+        }
+    }
+    private fun checkPosition(value:Int, increment: Boolean):Int{
+        var return_value = 0
+
+        if (increment){
+            if (value == list.size - 1) {
+                return_value = 0
+            } else {
+                return_value = ++position
+            }
+        }else{
+            if (value==0){
+                return_value = list.size-1
+            }else{
+                return_value = --position
+            }
+        }
+
+
+        return return_value
+    }
 
     override fun onBackPressed() {
         finish()
     }
+
 }
