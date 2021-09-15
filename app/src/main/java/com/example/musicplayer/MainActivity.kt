@@ -1,9 +1,7 @@
 package com.example.musicplayer
 
-import android.annotation.SuppressLint
 import android.database.Cursor
 import android.media.AudioAttributes
-import android.media.Image
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.net.Uri
@@ -29,8 +27,10 @@ class MainActivity : AppCompatActivity() {
     var list: ArrayList<SongModel> = ArrayList()
     private lateinit var runnable: Runnable
     private lateinit var albumImage: ImageView
+    private lateinit var songName: TextView
+    private lateinit var artistName: TextView
     private var handler = Handler()
-    private var mediaPlayer: MediaPlayer? = null
+    private var mediaPlayer: MediaPlayer? = MediaPlayer()
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,9 +41,9 @@ class MainActivity : AppCompatActivity() {
         position = intent.getIntExtra("position", -1)
 
 
-        val songName = findViewById<TextView>(R.id.textView)
-        val artistName = findViewById<TextView>(R.id.textView2)
-        albumImage = findViewById<ImageView>(R.id.album_art)
+        songName = findViewById(R.id.textView)
+        artistName = findViewById(R.id.textView2)
+        albumImage = findViewById(R.id.album_art)
 
         val play_pause = findViewById<ImageButton>(R.id.play_pause)
         val previous = findViewById<ImageView>(R.id.previous)
@@ -52,14 +52,14 @@ class MainActivity : AppCompatActivity() {
         val seekBar = findViewById<SeekBar>(R.id.seekBar)
         val startTime = findViewById<TextView>(R.id.start_time)
         val endTime = findViewById<TextView>(R.id.end_time)
-        getIntentMethod(uri)
 
-        songName.text = list[position].name
-        artistName.text = list[position].artist
+        uri = list[position].songUri
 
+        setLayout(albumImage, songName, artistName, uri)
 
+        playMedia(uri)
 
-       //play & pause Button
+        //play & pause Button
         play_pause.setOnClickListener {
             if (mediaPlayer!!.isPlaying) {
                 play_pause.setBackgroundResource(R.drawable.play)
@@ -110,21 +110,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun setAlbumImage(image: ImageView, uri: Uri){
+    private fun setLayout(image: ImageView, song: TextView, artist: TextView, uri: Uri) {
         val byteArray = getAlbumArt(uri)
         Glide.with(applicationContext).asBitmap().load(byteArray).centerCrop().into(image)
 
+        song.text = list[position].name
+        artist.text = list[position].artist
     }
-
-    @RequiresApi(Build.VERSION_CODES.R)
-    private fun getIntentMethod(uri: Uri) {
-
-        if (uri != demUri) {
-            playMedia()
-            demUri = uri
-        }
-    }
-
 
     @RequiresApi(Build.VERSION_CODES.R)
     fun getAudioFiles(): ArrayList<SongModel> {
@@ -190,13 +182,11 @@ class MainActivity : AppCompatActivity() {
         return String.format("%02d:%02d", minutes, seconds)
     }
 
-    private fun playMedia() {
-        uri = list[position].songUri
-
-        setAlbumImage(albumImage, uri)
+    private fun playMedia(uri: Uri) {
+        setLayout(albumImage, songName, artistName, uri)
 
         try {
-            if (mediaPlayer == null) {
+            if (mediaPlayer != null) {
                 mediaPlayer = MediaPlayer().apply {
                     setDataSource(this@MainActivity, uri)
                     setAudioAttributes(
@@ -224,37 +214,48 @@ class MainActivity : AppCompatActivity() {
 
         return result
     }
-    private fun nextPrevious(name:Boolean){
-        if(name){
+
+    private fun nextPrevious(name: Boolean) {
+        if (name) {
+            mediaPlayer!!.stop()
+            mediaPlayer!!.reset()
+            mediaPlayer!!.release()
+
             position = checkPosition(position, true)
-            playMedia()
-        }else{
+            playMedia(list[position].songUri)
+        } else {
+            mediaPlayer!!.stop()
+            mediaPlayer!!.reset()
+            mediaPlayer!!.release()
+
             position = checkPosition(position, false)
-            playMedia()
+            playMedia(list[position].songUri)
         }
     }
-    private fun checkPosition(value:Int, increment: Boolean):Int{
+
+    private fun checkPosition(value: Int, increment: Boolean): Int {
         var return_value = 0
 
-        if (increment){
+        if (increment) {
             if (value == list.size - 1) {
                 return_value = 0
             } else {
                 return_value = ++position
             }
-        }else{
-            if (value==0){
-                return_value = list.size-1
-            }else{
+        } else {
+            if (value == 0) {
+                return_value = list.size - 1
+            } else {
                 return_value = --position
             }
         }
-
 
         return return_value
     }
 
     override fun onBackPressed() {
+        mediaPlayer!!.stop()
+        mediaPlayer!!.reset()
         finish()
     }
 
