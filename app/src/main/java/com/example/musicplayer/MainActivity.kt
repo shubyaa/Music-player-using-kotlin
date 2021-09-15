@@ -1,27 +1,34 @@
 package com.example.musicplayer
 
+import android.annotation.SuppressLint
 import android.database.Cursor
 import android.media.AudioAttributes
+import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
-import android.widget.*
+import android.util.Log
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.example.musicplayer.Adapter.SongsAdapter.*
+import com.bumptech.glide.Glide
 import com.example.musicplayer.Model.SongModel
-import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity() {
     var position: Int = -1
     var uri: Uri = Uri.EMPTY
+    var demUri: Uri = Uri.EMPTY
     var list: ArrayList<SongModel> = ArrayList()
     private lateinit var runnable: Runnable
     private var handler = Handler()
-    private var mediaPlayer: MediaPlayer? = MediaPlayer()
+    private var mediaPlayer: MediaPlayer? = null
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         list = getAudioFiles()
         position = intent.getIntExtra("position", -1)
 
+        uri = list[position].songUri
 
         val songName = findViewById<TextView>(R.id.textView)
         val artistName = findViewById<TextView>(R.id.textView2)
@@ -43,10 +51,13 @@ class MainActivity : AppCompatActivity() {
         val seekBar = findViewById<SeekBar>(R.id.seekBar)
         val startTime = findViewById<TextView>(R.id.start_time)
         val endTime = findViewById<TextView>(R.id.end_time)
-        getIntentMethod()
+        getIntentMethod(uri)
 
         songName.text = list[position].name
         artistName.text = list[position].artist
+
+        val byteArray = getAlbumArt(uri)
+        Glide.with(applicationContext).asBitmap().load(byteArray).centerCrop().into(albumImage)
 
 
         play_pause.setOnClickListener {
@@ -62,8 +73,8 @@ class MainActivity : AppCompatActivity() {
         seekBar.max = mediaPlayer!!.duration
         runnable = Runnable {
             seekBar.progress = mediaPlayer!!.currentPosition
-            startTime.text = mediaPlayer!!.currentPosition.toString()
-            endTime.text = mediaPlayer!!.duration.toString()
+            startTime.text = timeFormat(mediaPlayer!!.currentPosition)
+            endTime.text = timeFormat(mediaPlayer!!.duration)
 
             handler.postDelayed(runnable, 1000)
 
@@ -93,78 +104,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    private fun getIntentMethod() {
+    private fun getIntentMethod(uri: Uri) {
 
-        uri = Uri.EMPTY
-        uri = list[position].songUri
-
-        if (mediaPlayer!!.isPlaying) {
-            mediaPlayer!!.stop()
-            mediaPlayer!!.reset()
-            mediaPlayer!!.release()
-
-            if (uri != Uri.EMPTY) {
-                if (mediaPlayer != null) {
-
-                    mediaPlayer = MediaPlayer().apply {
-                        setDataSource(this@MainActivity, uri)
-                        setAudioAttributes(
-                            AudioAttributes.Builder()
-                                .setUsage(AudioAttributes.USAGE_MEDIA)
-                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                .build()
-                        )
-                        prepare()
-                    }
-                    mediaPlayer!!.start()
-                } else {
-                    mediaPlayer = MediaPlayer().apply {
-                        setDataSource(this@MainActivity, uri)
-                        setAudioAttributes(
-                            AudioAttributes.Builder()
-                                .setUsage(AudioAttributes.USAGE_MEDIA)
-                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                .build()
-                        )
-                        prepare()
-                    }
-                    mediaPlayer!!.start()
-                }
-
-            }
-        } else {
-            if (uri != Uri.EMPTY) {
-
-                if (mediaPlayer != null) {
-                    mediaPlayer!!.stop()
-                    mediaPlayer!!.reset()
-                    mediaPlayer!!.release()
-
-                    mediaPlayer = MediaPlayer().apply {
-                        setDataSource(this@MainActivity, uri)
-                        setAudioAttributes(
-                            AudioAttributes.Builder()
-                                .setUsage(AudioAttributes.USAGE_MEDIA)
-                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                .build()
-                        )
-                        prepare()
-                    }
-                    mediaPlayer!!.start()
-                } else {
-                    mediaPlayer = MediaPlayer().apply {
-                        setDataSource(this@MainActivity, uri)
-                        setAudioAttributes(
-                            AudioAttributes.Builder()
-                                .setUsage(AudioAttributes.USAGE_MEDIA)
-                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                .build()
-                        )
-                        prepare()
-                    }
-                    mediaPlayer!!.start()
-                }
-            }
+        if (uri != demUri) {
+            playMedia()
+            demUri = uri
         }
     }
 
@@ -227,9 +171,46 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    override fun onBackPressed() {
-        mediaPlayer!!.stop()
-        finish()
+    @SuppressLint("SimpleDateFormat")
+    fun timeFormat(duration: Int): String {
+        val minutes = (duration % (1000 * 60 * 60) / (1000 * 60))
+        val seconds = (duration % (1000 * 60 * 60) % (1000 * 60) / 1000)
 
+        return String.format("%02d:%02d", minutes, seconds)
+    }
+
+    private fun playMedia() {
+        try {
+            if (mediaPlayer == null) {
+                mediaPlayer = MediaPlayer().apply {
+                    setDataSource(this@MainActivity, uri)
+                    setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .build()
+                    )
+                    prepare()
+                }
+                mediaPlayer!!.start()
+            }
+        } catch (e: Exception) {
+            Log.i("exception_PlayMedia", e.toString())
+        }
+    }
+
+    private fun getAlbumArt(uri: Uri): ByteArray? {
+
+        val metadataRetriever = MediaMetadataRetriever()
+        metadataRetriever.setDataSource(uri.toString())
+
+        val result: ByteArray? = metadataRetriever.embeddedPicture
+        metadataRetriever.release()
+
+        return result
+    }
+
+    override fun onBackPressed() {
+        finish()
     }
 }

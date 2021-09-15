@@ -138,10 +138,10 @@
             android:id="@+id/play_pause"
             android:layout_width="@dimen/_70sdp"
             android:layout_height="@dimen/_70sdp"
-            android:clickable="true"
             android:layout_marginTop="@dimen/_10sdp"
             android:background="@drawable/pause"
             android:backgroundTint="@color/white"
+            android:clickable="true"
             android:focusable="true" />
 
         <ImageView

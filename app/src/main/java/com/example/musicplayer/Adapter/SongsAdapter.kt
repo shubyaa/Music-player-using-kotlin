@@ -21,8 +21,6 @@ import com.example.musicplayer.R
 class SongsAdapter(private val arrayList: ArrayList<SongModel>, private val context: Context?) :
     RecyclerView.Adapter<SongsAdapter.MyViewHolder>() {
 
-    val array = arrayList
-
     class MyViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
         val imageView: ImageView = itemView.findViewById(R.id.album_thumbnail)
         val songName: TextView = itemView.findViewById(R.id.song_name)
