@@ -23,12 +23,12 @@ import com.example.musicplayer.Model.SongModel
 class MainActivity : AppCompatActivity() {
     var position: Int = -1
     var uri: Uri = Uri.EMPTY
-    var demUri: Uri = Uri.EMPTY
     var list: ArrayList<SongModel> = ArrayList()
     private lateinit var runnable: Runnable
     private lateinit var albumImage: ImageView
     private lateinit var songName: TextView
     private lateinit var artistName: TextView
+    private lateinit var back: ImageView
     private var handler = Handler()
     private var mediaPlayer: MediaPlayer? = MediaPlayer()
 
@@ -44,6 +44,8 @@ class MainActivity : AppCompatActivity() {
         songName = findViewById(R.id.textView)
         artistName = findViewById(R.id.textView2)
         albumImage = findViewById(R.id.album_art)
+
+        back = findViewById(R.id.back)
 
         val play_pause = findViewById<ImageButton>(R.id.play_pause)
         val previous = findViewById<ImageView>(R.id.previous)
@@ -77,6 +79,12 @@ class MainActivity : AppCompatActivity() {
             nextPrevious(name = false)
         }
 
+        back.setOnClickListener {
+            mediaPlayer!!.stop()
+            mediaPlayer!!.reset()
+            finish()
+        }
+
         seekBar.max = mediaPlayer!!.duration
         runnable = Runnable {
             seekBar.progress = mediaPlayer!!.currentPosition
@@ -99,11 +107,16 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
+                if (mediaPlayer!!.isPlaying) {
+                    mediaPlayer!!.seekTo(seekBar!!.progress)
+                    startTime.text = seekBar.progress.toString()
+                }
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-
+                if (mediaPlayer!!.isPlaying) {
+                    mediaPlayer!!.seekTo(seekBar!!.progress)
+                }
             }
 
         })
