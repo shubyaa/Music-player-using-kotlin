@@ -18,10 +18,14 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.musicplayer.Model.SongModel
+import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
     var position: Int = -1
+    var shuffle_check = true
     var uri: Uri = Uri.EMPTY
     var list: ArrayList<SongModel> = ArrayList()
     private lateinit var runnable: Runnable
@@ -29,6 +33,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var songName: TextView
     private lateinit var artistName: TextView
     private lateinit var back: ImageView
+    private lateinit var play_pause: ImageButton
+    private lateinit var previous: ImageView
+    private lateinit var next: ImageView
+    private lateinit var seekBar: SeekBar
+    private lateinit var startTime: TextView
+    private lateinit var endTime: TextView
+    private lateinit var shuffle: ImageButton
+    private lateinit var loop: ImageButton
+
     private var handler = Handler()
     private var mediaPlayer: MediaPlayer? = MediaPlayer()
 
@@ -47,13 +60,16 @@ class MainActivity : AppCompatActivity() {
 
         back = findViewById(R.id.back)
 
-        val play_pause = findViewById<ImageButton>(R.id.play_pause)
-        val previous = findViewById<ImageView>(R.id.previous)
-        val next = findViewById<ImageView>(R.id.next)
+        play_pause = findViewById(R.id.play_pause)
+        previous = findViewById(R.id.previous)
+        next = findViewById(R.id.next)
 
-        val seekBar = findViewById<SeekBar>(R.id.seekBar)
-        val startTime = findViewById<TextView>(R.id.start_time)
-        val endTime = findViewById<TextView>(R.id.end_time)
+        seekBar = findViewById(R.id.seekBar)
+        startTime = findViewById(R.id.start_time)
+        endTime = findViewById(R.id.end_time)
+
+        shuffle = findViewById(R.id.shuffle)
+        loop = findViewById(R.id.loop)
 
         uri = list[position].songUri
 
@@ -85,6 +101,7 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
 
+        // All About Seekbar
         seekBar.max = mediaPlayer!!.duration
         runnable = Runnable {
             seekBar.progress = mediaPlayer!!.currentPosition
@@ -121,7 +138,42 @@ class MainActivity : AppCompatActivity() {
 
         })
 
+        //Shuffle Button
+        /*
+        shuffle.setOnClickListener {
+            if (!shuffle_check) {
+                shuffle.setBackgroundResource(R.drawable.shuffle)
+                shuffle_check = true
+
+            }else{
+                shuffle.setBackgroundResource(R.drawable.shuffle_dark)
+                val demoList: ArrayList<SongModel> = shuffle(list, position)
+                playMedia(demoList[position].songUri)
+                Log.i("shuffle", demoList.toString())
+                shuffle_check = false
+            }
+        } */
     }
+
+    private fun shuffle(list: ArrayList<SongModel>, position: Int): ArrayList<SongModel> {
+        val random = Random()
+
+        var i = 0
+        while (i < list.size-1) {
+            if (i != position){
+                val j = random.nextInt(i + 1)
+                val temp = list[i]
+                list[i] = list[j]
+                list[j] = temp
+            }else{
+                i++
+            }
+        }
+
+
+        return list
+    }
+
 
     private fun setLayout(image: ImageView, song: TextView, artist: TextView, uri: Uri) {
         val byteArray = getAlbumArt(uri)

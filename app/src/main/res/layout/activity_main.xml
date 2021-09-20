@@ -10,7 +10,8 @@
         android:id="@+id/album_art"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="Album" />
+        android:contentDescription="Album"
+        android:src="@drawable/music_note" />
 
     <View
         android:layout_width="match_parent"
@@ -118,12 +119,37 @@
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/shuffle_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/linear"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/player"
+        app:layout_constraintVertical_bias=".7">
+
+        <ImageButton
+            android:id="@+id/shuffle"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="@drawable/shuffle" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/player">
+        app:layout_constraintEnd_toStartOf="@+id/loop_layout"
+        app:layout_constraintHorizontal_bias=".9"
+        app:layout_constraintStart_toEndOf="@+id/shuffle_layout"
+        app:layout_constraintTop_toBottomOf="@+id/player"
+        app:layout_constraintVertical_bias=".6">
 
 
         <ImageView
@@ -153,6 +179,27 @@
             android:clickable="true"
             android:focusable="true"
             android:src="@drawable/next" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/loop_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/linear"
+        app:layout_constraintTop_toBottomOf="@+id/player"
+        app:layout_constraintVertical_bias=".7">
+
+        <ImageButton
+            android:id="@+id/loop"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="@drawable/loop" />
 
     </LinearLayout>
 
