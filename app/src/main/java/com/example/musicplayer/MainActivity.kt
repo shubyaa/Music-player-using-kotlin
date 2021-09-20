@@ -10,10 +10,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
 import android.util.Log
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.SeekBar
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -25,7 +22,8 @@ import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
     var position: Int = -1
-    var shuffle_check = true
+    var shuffle_check = false
+    var repeat_check = false
     var uri: Uri = Uri.EMPTY
     var list: ArrayList<SongModel> = ArrayList()
     private lateinit var runnable: Runnable
@@ -102,18 +100,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         // All About Seekbar
-        seekBar.max = mediaPlayer!!.duration
-        runnable = Runnable {
-            seekBar.progress = mediaPlayer!!.currentPosition
-            startTime.text = timeFormat(mediaPlayer!!.currentPosition)
-            endTime.text = timeFormat(mediaPlayer!!.duration)
-
-            handler.postDelayed(runnable, 1000)
-
-        }
-
-        handler.postDelayed(runnable, 1000)
-
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (mediaPlayer != null && fromUser) {
@@ -139,39 +125,36 @@ class MainActivity : AppCompatActivity() {
         })
 
         //Shuffle Button
-        /*
         shuffle.setOnClickListener {
             if (!shuffle_check) {
-                shuffle.setBackgroundResource(R.drawable.shuffle)
                 shuffle_check = true
-
-            }else{
                 shuffle.setBackgroundResource(R.drawable.shuffle_dark)
-                val demoList: ArrayList<SongModel> = shuffle(list, position)
-                playMedia(demoList[position].songUri)
-                Log.i("shuffle", demoList.toString())
+            } else {
                 shuffle_check = false
-            }
-        } */
-    }
-
-    private fun shuffle(list: ArrayList<SongModel>, position: Int): ArrayList<SongModel> {
-        val random = Random()
-
-        var i = 0
-        while (i < list.size-1) {
-            if (i != position){
-                val j = random.nextInt(i + 1)
-                val temp = list[i]
-                list[i] = list[j]
-                list[j] = temp
-            }else{
-                i++
+                shuffle.setBackgroundResource(R.drawable.shuffle)
             }
         }
 
+        //Repeat Button
+        loop.setOnClickListener {
+            if (!repeat_check) {
+                repeat_check = true
+                loop.setBackgroundResource(R.drawable.loop_dark)
+            } else {
+                repeat_check = false
+                loop.setBackgroundResource(R.drawable.loop)
+            }
+        }
+    }
 
-        return list
+    private fun shuffle(start: Int, position: Int): Int {
+        return rand(start, position)
+
+    }
+
+    private fun rand(start: Int, end: Int): Int {
+        require(start <= end) { "Illegal Argument" }
+        return (start..end).random()
     }
 
 
@@ -263,10 +246,56 @@ class MainActivity : AppCompatActivity() {
                     prepare()
                 }
                 mediaPlayer!!.start()
+                adjustSeekBar(seekBar)
             }
         } catch (e: Exception) {
             Log.i("exception_PlayMedia", e.toString())
         }
+    }
+
+    private fun adjustSeekBar(seekBar: SeekBar) {
+        seekBar.max = mediaPlayer!!.duration
+        runnable = Runnable {
+            seekBar.progress = mediaPlayer!!.currentPosition
+            startTime.text = timeFormat(mediaPlayer!!.currentPosition)
+            endTime.text = timeFormat(mediaPlayer!!.duration)
+
+            mediaPlayer!!.setOnCompletionListener {
+                if (shuffle_check && !repeat_check) {
+                    mediaPlayer!!.stop()
+                    mediaPlayer!!.reset()
+                    mediaPlayer!!.release()
+
+                    position = shuffle(0, list.size-1)
+                    playMedia(list[position].songUri)
+
+                } else if (!shuffle_check && repeat_check) {
+                    mediaPlayer!!.stop()
+                    mediaPlayer!!.reset()
+                    mediaPlayer!!.release()
+
+                    playMedia(list[position].songUri)
+
+                } else if (!shuffle_check && !repeat_check) {
+
+                    nextPrevious(true)
+
+                } else if (shuffle_check && repeat_check) {
+
+                    mediaPlayer!!.stop()
+                    mediaPlayer!!.reset()
+                    mediaPlayer!!.release()
+
+                    playMedia(list[position].songUri)
+                }
+
+            }
+
+            handler.postDelayed(runnable, 100)
+
+        }
+
+        handler.postDelayed(runnable, 100)
     }
 
     private fun getAlbumArt(uri: Uri): ByteArray? {
