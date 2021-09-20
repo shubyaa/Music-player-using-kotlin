@@ -1,6 +1,7 @@
 package com.example.musicplayer
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
@@ -8,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -100,7 +102,24 @@ class ListActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        this.finish()
+        val dialogBuilder = AlertDialog.Builder(this)
+
+        dialogBuilder.setMessage("Are you sure you want to Exit?")
+            .setCancelable(false)
+            .setPositiveButton("Exit", DialogInterface.OnClickListener { dialogInterface, i ->
+                finish()
+            })
+            .setNegativeButton(
+                "Cancel",
+                DialogInterface.OnClickListener { dialogInterface, i -> dialogInterface.cancel() })
+
+        val alert = dialogBuilder.create()
+
+        alert.setTitle("Exit?")
+
+        alert.show()
+
+
     }
 
     private fun requestPermission() {
@@ -121,5 +140,6 @@ class ListActivity : AppCompatActivity() {
         ) == PackageManager.PERMISSION_GRANTED
 
     }
+
 
 }
