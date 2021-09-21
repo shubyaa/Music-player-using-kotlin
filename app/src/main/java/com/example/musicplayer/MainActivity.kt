@@ -1,5 +1,7 @@
 package com.example.musicplayer
 
+import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.media.AudioAttributes
 import android.media.MediaMetadataRetriever
@@ -10,9 +12,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
+import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -82,20 +82,7 @@ class MainActivity : AppCompatActivity() {
         playMedia(uri)
         //menu
         menu.setOnClickListener {
-            Toast.makeText(this, "Click", Toast.LENGTH_SHORT).show()
-
-            popupMenu = PopupMenu(this, it)
-            popupMenu.menuInflater.inflate(R.menu.menu, popupMenu.menu)
-            popupMenu.setOnMenuItemClickListener {
-                when(it.itemId){
-                    R.id.share ->
-                        Toast.makeText(this, "shareButton", Toast.LENGTH_SHORT).show()
-                    R.id.delete ->
-                        Toast.makeText(this, "deleteButton", Toast.LENGTH_SHORT).show()
-                }
-                true
-            }
-            popupMenu.show()
+            openMenu(this, it)
         }
 
         //play & pause Button
@@ -119,6 +106,8 @@ class MainActivity : AppCompatActivity() {
         back.setOnClickListener {
             mediaPlayer!!.stop()
             mediaPlayer!!.reset()
+            mediaPlayer!!.release()
+            handler.removeCallbacks(runnable)
             finish()
         }
 
@@ -168,11 +157,6 @@ class MainActivity : AppCompatActivity() {
                 loop.setBackgroundResource(R.drawable.loop)
             }
         }
-    }
-
-    private fun shuffle(start: Int, position: Int): Int {
-        return rand(start, position)
-
     }
 
     private fun rand(start: Int, end: Int): Int {
@@ -276,6 +260,59 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun openMenu(context: Context, view: View) {
+        popupMenu = PopupMenu(context, view)
+        popupMenu.menuInflater.inflate(R.menu.menu, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.share ->
+                    shareMenuOption()
+                R.id.delete ->
+                    deleteMenuOption()
+            }
+            true
+        }
+        popupMenu.show()
+    }
+
+    private fun shareMenuOption() {
+        val shareIntent = Intent().apply {
+            this.action = Intent.ACTION_SEND
+            this.type = "audio/*"
+            this.putExtra(Intent.EXTRA_STREAM, list[position].songUri)
+        }
+
+        startActivity(Intent.createChooser(shareIntent, "Share this file using :"))
+    }
+
+    private fun deleteMenuOption() {
+       /* val file = File(list[position].songUri.toString())
+        val dialogBuilder = AlertDialog.Builder(this)
+        try {
+            dialogBuilder.setMessage("Are you sure you want to delete ${list[position].name}?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", DialogInterface.OnClickListener { dialogInterface, i ->
+                    file.delete()
+                    nextPrevious(true)
+                })
+                .setNegativeButton(
+                    "No",
+                    DialogInterface.OnClickListener { dialogInterface, i -> dialogInterface.cancel() })
+
+            val alert = dialogBuilder.create()
+
+            alert.setTitle("Delete File?")
+
+            alert.show()
+        }catch (e: java.lang.Exception){
+            Log.i("exception at delete",e.toString())
+        }
+
+        */
+
+        Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show()
+    }
+
     private fun adjustSeekBar(seekBar: SeekBar) {
         seekBar.max = mediaPlayer!!.duration
         runnable = Runnable {
@@ -284,34 +321,7 @@ class MainActivity : AppCompatActivity() {
             endTime.text = timeFormat(mediaPlayer!!.duration)
 
             mediaPlayer!!.setOnCompletionListener {
-                if (shuffle_check && !repeat_check) {
-                    mediaPlayer!!.stop()
-                    mediaPlayer!!.reset()
-                    mediaPlayer!!.release()
-
-                    position = shuffle(0, list.size - 1)
-                    playMedia(list[position].songUri)
-
-                } else if (!shuffle_check && repeat_check) {
-                    mediaPlayer!!.stop()
-                    mediaPlayer!!.reset()
-                    mediaPlayer!!.release()
-
-                    playMedia(list[position].songUri)
-
-                } else if (!shuffle_check && !repeat_check) {
-
-                    nextPrevious(true)
-
-                } else if (shuffle_check && repeat_check) {
-
-                    mediaPlayer!!.stop()
-                    mediaPlayer!!.reset()
-                    mediaPlayer!!.release()
-
-                    playMedia(list[position].songUri)
-                }
-
+                nextPrevious(true)
             }
 
             handler.postDelayed(runnable, 100)
@@ -357,13 +367,30 @@ class MainActivity : AppCompatActivity() {
             if (value == list.size - 1) {
                 return_value = 0
             } else {
-                return_value = ++position
+                if (shuffle_check && !repeat_check) {
+                    return_value = rand(0, list.size - 1)
+                } else if (!shuffle_check && repeat_check ||
+                    shuffle_check && repeat_check
+                ) {
+
+                    return_value = position
+                } else {
+                    return_value = ++position
+                }
+
             }
         } else {
             if (value == 0) {
                 return_value = list.size - 1
             } else {
-                return_value = --position
+                if (shuffle_check && repeat_check || !shuffle_check && repeat_check) {
+                    return_value = position
+                } else if (shuffle_check && !repeat_check) {
+                    return_value = rand(0, list.size - 1)
+                } else {
+                    return_value = --position
+                }
+
             }
         }
 
@@ -374,6 +401,8 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         mediaPlayer!!.stop()
         mediaPlayer!!.reset()
+        mediaPlayer!!.release()
+        handler.removeCallbacks(runnable)
         finish()
     }
 
