@@ -10,6 +10,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -39,6 +42,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var endTime: TextView
     private lateinit var shuffle: ImageButton
     private lateinit var loop: ImageButton
+    private lateinit var menu: ImageButton
+
+    private lateinit var popupMenu: PopupMenu
 
     private var handler = Handler()
     private var mediaPlayer: MediaPlayer? = MediaPlayer()
@@ -51,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         list = getAudioFiles()
         position = intent.getIntExtra("position", -1)
 
-
+        menu = findViewById(R.id.menu)
         songName = findViewById(R.id.textView)
         artistName = findViewById(R.id.textView2)
         albumImage = findViewById(R.id.album_art)
@@ -74,6 +80,23 @@ class MainActivity : AppCompatActivity() {
         setLayout(albumImage, songName, artistName, uri)
 
         playMedia(uri)
+        //menu
+        menu.setOnClickListener {
+            Toast.makeText(this, "Click", Toast.LENGTH_SHORT).show()
+
+            popupMenu = PopupMenu(this, it)
+            popupMenu.menuInflater.inflate(R.menu.menu, popupMenu.menu)
+            popupMenu.setOnMenuItemClickListener {
+                when(it.itemId){
+                    R.id.share ->
+                        Toast.makeText(this, "shareButton", Toast.LENGTH_SHORT).show()
+                    R.id.delete ->
+                        Toast.makeText(this, "deleteButton", Toast.LENGTH_SHORT).show()
+                }
+                true
+            }
+            popupMenu.show()
+        }
 
         //play & pause Button
         play_pause.setOnClickListener {
@@ -266,7 +289,7 @@ class MainActivity : AppCompatActivity() {
                     mediaPlayer!!.reset()
                     mediaPlayer!!.release()
 
-                    position = shuffle(0, list.size-1)
+                    position = shuffle(0, list.size - 1)
                     playMedia(list[position].songUri)
 
                 } else if (!shuffle_check && repeat_check) {
@@ -347,10 +370,12 @@ class MainActivity : AppCompatActivity() {
         return return_value
     }
 
+
     override fun onBackPressed() {
         mediaPlayer!!.stop()
         mediaPlayer!!.reset()
         finish()
     }
+
 
 }
