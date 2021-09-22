@@ -148,3 +148,5 @@ val mediaplayer = MediaPlayer()
 To report a specific problem or feature request, open [a new issue on Github](https://github.com/shubyaa/Music-player-using-kotlin/issues/new).
 
 ## License
+
+O know more, check out the [License file](https://github.com/shubyaa/Music-player-using-kotlin/blob/master/LICENSE)
