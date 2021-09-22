@@ -149,4 +149,4 @@ To report a specific problem or feature request, open [a new issue on Github](ht
 
 ## License
 
-O know more, check out the [License file](https://github.com/shubyaa/Music-player-using-kotlin/blob/master/LICENSE)
+To know more, check out the [License file](https://github.com/shubyaa/Music-player-using-kotlin/blob/master/LICENSE).
