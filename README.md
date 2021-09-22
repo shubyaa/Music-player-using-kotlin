@@ -118,7 +118,6 @@ To open the player activity (In our case, MainActivity.kt), we made the use of [
 On opening of the Player, it looks something like this.
 
 ![SreenShot](https://github.com/shubyaa/Music-player-using-kotlin/blob/master/Screenshot_1.jpg)
-
 ![Screenshot](https://github.com/shubyaa/Music-player-using-kotlin/blob/master/Screenshot_2.jpg)
 
 Various functions like play, pause, next, previous, shuffle, repeat, share & back can be performed. To see in detail, check out the [ListActivity.kt](https://github.com/shubyaa/Music-player-using-kotlin/blob/master/app/src/main/java/com/example/musicplayer/ListActivity.kt) here.
