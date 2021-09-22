@@ -1,5 +1,7 @@
 # Music Player Using Kotlin
 
+![Logo]()
+
 This is an Android Application made using Kotlin Language. This app is made in **Android 6.0 version** with minimum SDK Version as 23 **(API Level 23)**.
 
 The flow of project goes as follows:-
