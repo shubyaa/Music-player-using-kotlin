@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setLayout(image: ImageView, song: TextView, artist: TextView, uri: Uri) {
         val byteArray = getAlbumArt(uri)
-        Glide.with(applicationContext).asBitmap().load(byteArray).centerCrop().into(image)
+        Glide.with(applicationContext).asBitmap().load(byteArray).centerCrop().placeholder(R.drawable.music_note).into(image)
 
         song.text = list[position].name
         artist.text = list[position].artist

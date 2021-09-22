@@ -36,13 +36,11 @@ class SongsAdapter(private val arrayList: ArrayList<SongModel>, private val cont
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         //This method retrieves data and displays inside the view (i.e. Card) while binding
         val byteArray = getAlbumArt(arrayList[position].image)
-        if (byteArray != null) {
-            //Glide Library has a function to convert byte array and display as Bitmap inside the target or ImageView.
-            Glide.with(context!!).asBitmap().load(byteArray).centerCrop().into(holder.imageView)
-        } else {
-            Glide.with(context!!).asBitmap().load(R.drawable.music_note).centerCrop()
-                .into(holder.imageView)
-        }
+
+        //Glide Library has a function to convert byte array and display as Bitmap inside the target or ImageView.
+        Glide.with(context!!).asBitmap().load(byteArray).centerCrop()
+            .placeholder(R.drawable.music_note).into(holder.imageView)
+
 
         holder.songName.text = arrayList[position].name
         holder.artistName.text = arrayList[position].artist
