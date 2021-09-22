@@ -6,13 +6,8 @@
         android:id="@+id/share"
        android:icon="@drawable/share"
         android:title="Share"
-        app:showAsAction="withText"/>
+        app:showAsAction="never"/>
 
-    <item
-        android:id="@+id/delete"
-        android:icon="@drawable/delete"
-        android:title="Delete"
-        app:showAsAction="withText" />
 
 
 </menu>

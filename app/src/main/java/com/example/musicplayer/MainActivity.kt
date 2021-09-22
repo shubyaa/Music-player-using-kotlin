@@ -1,7 +1,6 @@
 package com.example.musicplayer
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.database.Cursor
 import android.media.AudioAttributes
@@ -16,7 +15,6 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.musicplayer.Model.SongModel
@@ -269,8 +267,6 @@ class MainActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.share ->
                     shareMenuOption()
-                R.id.delete ->
-                    deleteMenuOption()
             }
             true
         }
@@ -285,29 +281,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         startActivity(Intent.createChooser(shareIntent, "Share this file using :"))
-    }
-
-    private fun deleteMenuOption() {
-        val dialogBuilder = AlertDialog.Builder(this)
-
-        try {
-            dialogBuilder.setMessage("Are you sure you want to delete ${list[position].name}?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", DialogInterface.OnClickListener { dialogInterface, i ->
-//WE HAVE TO ADD SOMETHING TO DELETE
-                })
-                .setNegativeButton(
-                    "No"
-                ) { dialogInterface, i -> dialogInterface.cancel() }
-
-            val alert = dialogBuilder.create()
-
-            alert.setTitle("Delete File?")
-            alert.show()
-
-        } catch (e: java.lang.Exception) {
-            Log.i("exception at delete", e.toString())
-        }
     }
 
     private fun adjustSeekBar(seekBar: SeekBar) {
