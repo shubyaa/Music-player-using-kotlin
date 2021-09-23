@@ -152,3 +152,7 @@ To report a specific problem or feature request, open [a new issue on Github](ht
 ## License
 
 To know more, check out the [License file](https://github.com/shubyaa/Music-player-using-kotlin/blob/master/LICENSE).
+
+## Download & Install
+
+To use this this applicatioon, download & install the [apk file](https://github.com/shubyaa/Music-player-using-kotlin/blob/master/output/app-debug.apk)
